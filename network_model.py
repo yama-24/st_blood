@@ -1,6 +1,5 @@
 # 必要なモジュールのインポート
 from torchvision import transforms
-import torch
 import torch.nn as nn
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor

@@ -1,6 +1,5 @@
 import streamlit as st
 import torch
-import numpy as np
 import io
 from PIL import Image
 from torchvision.transforms.functional import to_pil_image
