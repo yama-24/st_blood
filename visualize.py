@@ -1,19 +1,27 @@
 import numpy as np
 from PIL import Image
 from PIL import ImageDraw, ImageFont
+import torch
+from torchvision.ops import batched_nms
 
 def visualize_results(input_image, boxes, labels, scores):
     bccd_labels = ['BG', 'RBC', 'WBC', 'Platelets']
 
-    # `output` の値がリストの場合、NumPy 配列に変換する
-    boxes = np.array(boxes)
-    labels = np.array(labels)
-    scores = np.array(scores) if 'scores' in scores else None
+    # NumPy 配列を PyTorch テンソルに変換
+    boxes = torch.from_numpy(np.array(boxes)).float()
+    labels = torch.from_numpy(np.array(labels)).long()  # 整数型に変更
+    scores = torch.from_numpy(np.array(scores)).float()
 
     if scores is not None:
-        high_confidence_indices = scores > 0.5
-        boxes = boxes[high_confidence_indices]
-        labels = labels[high_confidence_indices]
+        boxes = boxes[scores > 0.5]
+        labels = labels[scores > 0.5]
+        scores = scores[scores > 0.5]
+
+    # 採用する boxes の要素番号が返り値で得られる
+    keep = batched_nms(boxes=boxes, scores=scores, idxs=labels, iou_threshold=0.0)
+    boxes = boxes[keep]
+    labels = labels[keep]
+    scores = scores[keep]
 
     draw = ImageDraw.Draw(input_image)
 
@@ -30,6 +38,7 @@ def visualize_results(input_image, boxes, labels, scores):
         # box
         draw.rectangle(box, outline='red')
         # label
+        label = label.item()
         text = bccd_labels[label]
 
         # デフォルトフォントを使用してテキストサイズを計算
