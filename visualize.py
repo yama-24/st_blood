@@ -18,7 +18,7 @@ def visualize_results(input_image, boxes, labels, scores):
         scores = scores[scores > 0.5]
 
     # 採用する boxes の要素番号が返り値で得られる
-    keep = batched_nms(boxes=boxes, scores=scores, idxs=labels, iou_threshold=0.0)
+    keep = batched_nms(boxes=boxes, scores=scores, idxs=labels, iou_threshold=0.1)
     boxes = boxes[keep]
     labels = labels[keep]
     scores = scores[keep]
